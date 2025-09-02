@@ -1,0 +1,31 @@
+[tool.black]
+line-length = 66
+target-version = ["py311"]
+exclude = '''
+(
+    \.venv
+  | env
+  | venv
+  | \.pdm-python
+  | build
+  | dist
+  | __pycache__
+  | \.mypy_cache
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 66
+known_first_party = "app"
+default_section = "THIRDPARTY"
+multi_line_output = 3
+include_trailing_comma = true
+skip = [
+    ".venv",
+    "env",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist"
+]
