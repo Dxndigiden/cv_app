@@ -7,6 +7,7 @@ from fastapi import (
     Request,
     status,
 )
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import decode_access_token
@@ -28,26 +29,14 @@ from app.utils.ai import improve_text
 
 router = APIRouter(prefix="/api/resumes", tags=["Резюме"])
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
+
 
 async def get_current_user(
-    request: Request, db: AsyncSession = Depends(get_session)
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_session),
 ):
-    """Получение текущего пользователя по токену."""
-    token = None
-
-    auth: str | None = request.headers.get("Authorization")
-    if auth and auth.startswith("Bearer "):
-        token = auth[7:]
-
-    if not token:
-        token = request.cookies.get("access_token")
-
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Нет токена",
-        )
-
+    """Получение текущего пользователя по JWT токену."""
     try:
         payload = decode_access_token(token)
         user_id = int(payload.get("sub"))
